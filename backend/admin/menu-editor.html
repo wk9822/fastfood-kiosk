@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Menu Editor</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <style>
+        .category-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .default-category {
+            color: #666;
+            font-style: italic;
+        }
+        .size-option {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .size-option.selected {
+            border-color: #ff6b00;
+            background-color: #fff5f0;
+        }
+        #image-upload-area, #logo-upload-area {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+        }
+        #item-image, #logo-upload {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        #image-preview, #logo-preview {
+            max-width: 100%;
+            max-height: 200px;
+            display: block;
+        }
+        .upload-hint {
+            position: absolute;
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+            color: #666;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+        }
+        .empty-state img {
+            width: 80px;
+            height: 80px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+        .menu-item-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .menu-item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        #customization-options-list,
+        #ingredients-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .option-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .option-item-info {
+            flex: 1;
+        }
+        .option-item-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .option-item-price {
+            color: #ff6b00;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .ingredient-item-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .remove-option-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .remove-option-btn:hover {
+            background: #cc0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <div class="logo-container">
+                <img src="brand-logo.png" alt="Brand Logo" class="brand-logo" id="brand-logo">
+                <button id="edit-logo-btn" class="edit-logo-btn">Edit Logo</button>
+            </div>
+            <h1>MENU EDITOR</h1>
+        </header>
+        
+        <div class="admin-toolbar">
+            <button id="manage-categories-btn" class="btn-secondary">Manage Categories</button>
+            <button id="configure-tax-btn" class="btn-secondary">Configure Tax</button>
+            <a href="order-history.html" class="btn-secondary" style="text-decoration: none; display: inline-block;">📊 Order History</a>
+            <button id="new-item-btn" class="btn-primary">+ Add New Item</button>
+            <select id="category-filter" class="dropdown">
+                <option value="all">All Categories</option>
+            </select>
+        </div>
+
+        <div class="menu-items-grid" id="menu-items-container">
+            <div class="empty-state">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2NjYyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOCA4SDZhMiAyIDAgMCAwLTIgMnYxMGEyIDIgMCAwIDAgMiAyaDEyYTIgMiAwIDAgMCAyLTJWMTBhMiAyIDAgMCAwLTItMnoiLz48cGF0aCBkPSJNMTIgMTUuNWExLjUgMS41IDAgMSAwIDAtMyAxLjUgMS41IDAgMCAwIDAgM3oiLz48cGF0aCBkPSJNMTYuNSA4LjVWN2EyIDIgMCAwIDAtMi0haC00YTIgMiAwIDAgMC0yIDJ2MS41Ii8+PC9zdmc+" alt="Empty Menu">
+                <h3>No Menu Items Yet</h3>
+                <p>Click "Add New Item" to start building your menu</p>
+            </div>
+        </div>
+
+        <!-- Logo Update Modal -->
+        <div class="modal" id="logo-modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2>Update Brand Logo</h2>
+                <div class="form-group">
+                    <label>New Logo Image</label>
+                    <div class="image-upload-box" id="logo-upload-area">
+                        <img id="logo-preview" src="brand-logo.png" alt="Logo Preview">
+                        <input type="file" id="logo-upload" accept="image/*">
+                        <div class="upload-hint">Click to upload new logo</div>
+                    </div>
+                </div>
+                <button id="save-logo-btn" class="btn-primary">Save Logo</button>
+            </div>
+        </div>
+
+        <!-- Category Management Modal -->
+        <div class="modal" id="category-modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2>Manage Categories</h2>
+                <div class="form-group">
+                    <label>Add New Category</label>
+                    <div class="category-input-group">
+                        <input type="text" id="new-category-name" placeholder="Category name">
+                        <button id="add-category-btn" class="btn-primary">Add</button>
+                    </div>
+                </div>
+                <div class="category-list">
+                    <h3>Existing Categories</h3>
+                    <ul id="categories-list"></ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tax Configuration Modal -->
+        <div class="modal" id="tax-modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2>Configure Tax Rate</h2>
+                <div class="form-group">
+                    <label for="tax-rate-input">Tax Rate (%)</label>
+                    <input type="number" id="tax-rate-input" min="0" max="30" step="0.1" value="10">
+                </div>
+                <button id="save-tax-btn" class="btn-primary">Save Tax Rate</button>
+            </div>
+        </div>
+
+        <!-- Item Add/Edit Modal -->
+        <div class="modal" id="edit-modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2 id="item-modal-title">Add New Menu Item</h2>
+                <form id="item-form">
+                    <div class="form-group">
+                        <label for="item-name">Item Name*</label>
+                        <input type="text" id="item-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="item-price">Price ($)*</label>
+                        <input type="number" id="item-price" min="0" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="item-description">Description</label>
+                        <textarea id="item-description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="item-category">Category*</label>
+                        <select id="item-category" required></select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Product Image*</label>
+                        <div class="image-upload-box" id="image-upload-area">
+                            <img id="image-preview" src="data:image/svg+xml;base64,..." alt="Preview">
+                            <input type="file" id="item-image" accept="image/*">
+                            <div class="upload-hint">Click to upload image (required)</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ingredients (Display Only)</label>
+                        <p style="font-size: 12px; color: #666; margin: 5px 0;">Add ingredients for customers to see. Optional photo per ingredient. Customers cannot edit.</p>
+                        <div id="ingredients-list"></div>
+                        <div class="add-ingredient-row" style="display: flex; gap: 10px; margin-top: 10px; align-items: flex-end; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 120px;">
+                                <label style="font-size: 11px; color: #666;">Name</label>
+                                <input type="text" id="new-ingredient" placeholder="e.g., Cheese" style="width: 100%;">
+                            </div>
+                            <div class="ingredient-photo-upload" style="min-width: 80px;">
+                                <label style="font-size: 11px; color: #666;">Photo (optional)</label>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="file" id="new-ingredient-image" accept="image/*" style="display: none;">
+                                    <div id="ingredient-image-preview" style="width: 50px; height: 50px; border: 1px dashed #ddd; border-radius: 4px; overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; background: #f9f9f9;" title="Click to add photo">
+                                        <span style="font-size: 20px; color: #999;">+</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" id="add-ingredient-btn" class="btn-secondary">+ Add</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Customization Options (Optional)</label>
+                        <p style="font-size: 12px; color: #666; margin: 5px 0;">Add options like "Extra Sauce", "No Lettuce", etc.</p>
+                        <div id="customization-options-list">
+                            <!-- Customization options will be added here -->
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <input type="text" id="new-option-name" placeholder="Option name (e.g., Extra Sauce)" style="flex: 1;">
+                            <input type="number" id="new-option-price" placeholder="Extra price" step="0.01" min="0" value="0" style="width: 100px;">
+                            <button type="button" id="add-option-btn" class="btn-secondary">+ Add Option</button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" id="item-submit-btn">Add Item</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Only set defaults for tax and logo if not already set (menu data now comes from API)
+        if (!localStorage.getItem('taxRate')) {
+            localStorage.setItem('taxRate', '10');
+        }
+        if (!localStorage.getItem('brandLogo')) {
+            localStorage.setItem('brandLogo', 'brand-logo.png');
+        }
+    </script>
+    <script src="menu-editor.js"></script>
+</body>
+</html>

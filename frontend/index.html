@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff6b00',
+                        'primary-hover': '#e05d00'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="page-transitions.js"></script>
+    <style>
+        /* While waiting on Dine In / Take Away, keep menu/header blurred & hidden */
+        body.menu-hidden .customer-header,
+        body.menu-hidden .menu-container,
+        body.menu-hidden .cart-button {
+            filter: blur(14px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, filter 0.3s ease;
+        }
+
+        .menu-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .category-section {
+            margin-bottom: 40px;
+        }
+        .category-title {
+            color: #333;
+            border-bottom: 2px solid #ff6b00;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .category-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .menu-item {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .menu-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .item-info {
+            padding: 15px;
+        }
+        .item-info h3 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+        .price {
+            font-weight: bold;
+            color: #ff6b00;
+            font-size: 1.2em;
+        }
+        .description {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        .ingredients-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .ingredient-with-img {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85em;
+        }
+        .ingredient-thumb {
+            width: 24px;
+            height: 24px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .cart-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ff6b00;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff0000;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .size-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .size-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+        .size-option {
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+        .size-option.selected {
+            border-color: #ff6b00;
+            background-color: #fff5f0;
+        }
+        .quantity-selector {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .quantity-selector label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .qty-btn-modal {
+            background: #ff6b00;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .qty-btn-modal:hover {
+            background: #e05d00;
+        }
+        .qty-btn-modal:active {
+            transform: scale(0.95);
+        }
+        .qty-display-modal {
+            min-width: 40px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: #333;
+        }
+        .customization-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .customization-section h4 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 16px;
+        }
+        .customization-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .customization-option:hover {
+            border-color: #ff6b00;
+            background-color: #fff5f0;
+        }
+        .customization-option input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .customization-option input[type="checkbox"]:checked {
+            accent-color: #ff6b00;
+        }
+        .custom-price {
+            color: #ff6b00;
+            font-weight: bold;
+            margin-left: auto;
+            padding-left: 10px;
+        }
+        .empty-menu {
+            text-align: center;
+            padding: 50px 0;
+            color: #666;
+        }
+        .logo-updating {
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        /* Order Type Selection - Tailwind handles layout, keep hidden class */
+        .order-type-overlay.hidden {
+            display: none !important;
+        }
+        .order-type-badge {
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body class="menu-hidden">
+    <!-- Order Type Selection Overlay (shown before menu if not yet chosen) -->
+    <div class="order-type-overlay hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]" id="order-type-overlay">
+        <div class="w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="px-8 pt-10 pb-6 text-center">
+                <h2 class="text-xl font-semibold text-gray-800">How would you like your order?</h2>
+            </div>
+            <!-- Options - equal width, uniform spacing -->
+            <div class="flex gap-6 px-8 pb-10">
+                <button id="dine-in-btn" class="flex-1 min-w-0 flex flex-col items-center justify-center gap-4 py-8 px-6 rounded-xl border-2 border-primary text-primary bg-white hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 hover:shadow-lg active:scale-[0.98]">
+                    <span class="text-5xl leading-none">🍽️</span>
+                    <span class="text-lg font-semibold">Dine In</span>
+                </button>
+                <button id="take-away-btn" class="flex-1 min-w-0 flex flex-col items-center justify-center gap-4 py-8 px-6 rounded-xl border-2 border-primary text-primary bg-white hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 hover:shadow-lg active:scale-[0.98]">
+                    <span class="text-5xl leading-none">🥡</span>
+                    <span class="text-lg font-semibold">Take Away</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <header class="customer-header">
+        <!-- Back to order type "first page" -->
+        <button
+            id="back-to-order-type"
+            class="mr-2 inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1.5 text-sm font-medium text-white hover:bg-white/30 transition-colors"
+            type="button"
+        >
+            <span class="text-lg leading-none">←</span>
+            <span>New Order</span>
+        </button>
+
+        <img src="brand-logo.png" alt="Brand Logo" class="brand-logo" id="customer-logo">
+        <h1>Our Menu</h1>
+        <span class="order-type-badge px-4 py-1.5 rounded-full bg-white/30 text-sm font-medium cursor-pointer hover:bg-white/50 transition-colors" id="order-type-badge" title="Tap to change"></span>
+    </header>
+    
+    <div class="menu-container" id="menu-container">
+        <!-- Categories will load here -->
+    </div>
+
+    <!-- Floating Cart Button -->
+    <div class="cart-button" id="cart-button">
+        🛒
+        <span class="cart-badge" id="cart-badge">0</span>
+    </div>
+
+    <!-- Size Selection Modal -->
+    <div class="size-modal" id="size-modal">
+        <div class="size-modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="size-modal-title">Select Size</h2>
+            <div id="size-options"></div>
+            <div id="item-description"></div>
+            <button id="confirm-size-btn" class="btn-primary">Add to Cart</button>
+        </div>
+    </div>
+
+    <script src="menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #333;
+            color: white;
+        }
+        .order-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+        }
+        .order-column {
+            padding: 20px;
+        }
+        .preparing-col {
+            background: #222;
+        }
+        .ready-col {
+            background: #4CAF50;
+        }
+        .column-header {
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        .order-number {
+            font-size: 3em;
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="order-board">
+        <div class="order-column preparing-col">
+            <div class="column-header">PREPARING</div>
+            <div id="preparing-orders"></div>
+        </div>
+        <div class="order-column ready-col">
+            <div class="column-header">READY</div>
+            <div id="ready-orders"></div>
+        </div>
+    </div>
+
+    <script src="order-display.js"></script>
+</body>
+</html>

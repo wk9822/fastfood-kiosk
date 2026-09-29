@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="page-transitions.js"></script>
+</head>
+<body>
+    <header class="customer-header">
+        <img src="brand-logo.png" alt="Brand Logo" class="brand-logo" id="customer-logo">
+        <h1>Payment</h1>
+    </header>
+
+    <div class="payment-container">
+        <div class="payment-methods">
+            <h2>Select Payment Method</h2>
+            <div class="payment-options">
+                <div class="payment-method" data-method="cash">
+                    💵 Cash Payment
+                </div>
+                <div class="payment-method" data-method="card">
+                    💳 Credit/Debit Card
+                </div>
+                <div class="payment-method" data-method="mobile">
+                    📱 Mobile Payment
+                </div>
+            </div>
+            
+            <div class="payment-actions">
+                <button id="confirm-payment-btn" class="btn-primary">Confirm Payment</button>
+                <a href="cart.html" class="btn-secondary" onclick="event.preventDefault(); navigateWithFade('cart.html');">Back to Cart</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="confirmation-modal" id="confirmation-modal">
+        <div class="confirmation-content">
+            <h2>Order Confirmed!</h2>
+            <p>Thank you for your order</p>
+            <div class="order-id" id="order-id"></div>
+            <p>Your receipt has been printed</p>
+            <a href="index.html" class="btn-primary" onclick="event.preventDefault(); navigateWithFade('index.html');">Start New Order</a>
+        </div>
+    </div>
+
+    <script src="payment.js"></script>
+</body>
+</html>
